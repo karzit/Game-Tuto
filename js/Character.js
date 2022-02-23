@@ -1,4 +1,4 @@
-import { Constants } from '../app.js';
+import { app, Constants } from '../app.js';
 import { MovingObject } from './MovingObject.js';
 import { Vector } from './Vector.js';
 
@@ -7,6 +7,13 @@ const CharacterState = {
   Walk: 'Walk',
   Jump: 'Jump',
   GrabLedge: 'GrabLedge',
+}
+
+const sprites = {
+  [CharacterState.Stand]: ['#3af'],
+  [CharacterState.Walk]: ['#f56'],
+  [CharacterState.Jump]: ['#3fa'],
+  [CharacterState.GrabLedge]: ['#af3'],
 }
 
 export class Charactor extends MovingObject {
@@ -26,12 +33,6 @@ export class Charactor extends MovingObject {
   constructor(point) {
     super(point, Constants.cSize);
 
-    this.sprites = {
-      [CharacterState.Stand]: ['#3af'],
-      [CharacterState.Walk]: ['#f56'],
-      [CharacterState.Jump]: ['#3fa'],
-      [CharacterState.GrabLedge]: ['#af3'],
-    }
     this.mJumpSpeed = Constants.cJumpSpeed;
     this.mWalkSpeed = Constants.cWalkSpeed;
 
@@ -39,7 +40,7 @@ export class Charactor extends MovingObject {
 
     this.mScale = new Vector(1, 1);
   }
-  update(delta, pressedKeys) {
+  update(delta, pressedKeys, map) {
     switch (this.mCurrentState) {
       case CharacterState.Stand:
         this.standUpdate(delta, pressedKeys);
@@ -53,7 +54,7 @@ export class Charactor extends MovingObject {
       case CharacterState.GrabLedge:
         break;
     }
-    this.updatePhysics(delta);
+    this.updatePhysics(delta, map);
     if ((!this.mWasOnGround && this.mOnGround)
       || (!this.mWasAtCeiling && this.mAtCeiling)
       || (!this.mPushedLeftWall && this.mPusheLeftWall)
@@ -114,6 +115,12 @@ export class Charactor extends MovingObject {
       this.mCurrentState = CharacterState.Stand;
       return;
     }
+    if(this.mIsOut) {
+      this.point = new Vector(100, app.stageheight / 1.5);
+      this.mSpeed = new Vector(0,0);
+      this.mIsOut = false;
+      return;
+    }
 
     if (pressedKeys['ArrowRight'] == pressedKeys['ArrowLeft']) {
       this.mSpeed.x = 0;
@@ -141,7 +148,7 @@ export class Charactor extends MovingObject {
 
   render(ctx, stageheight) {
     ctx.beginPath();
-    ctx.fillStyle = this.sprites[this.mCurrentState];
+    ctx.fillStyle = sprites[this.mCurrentState];
     ctx.rect(
       this.point.x - this.size.width / 2,
       stageheight - (this.point.y + this.size.height),

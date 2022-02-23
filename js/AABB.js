@@ -4,7 +4,7 @@ export class AABB {
   /**
    * 
    * @param {Vector} point 
-   * @param {Vector} size 
+   * @param {{width:Number,height:Number}} size 
    */
   constructor(point, size) {
     this.point = point;

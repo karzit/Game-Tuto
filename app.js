@@ -1,4 +1,5 @@
 import { Charactor } from './js/Character.js';
+import { Map, TileType } from './js/Map.js';
 import { Vector } from './js/Vector.js';
 
 export const Constants = {
@@ -11,8 +12,8 @@ export const Constants = {
   cSize: {
     width: 60,
     height: 200,
-  }
-
+  },
+  cTileSize: 100,
 };
 
 export class App {
@@ -28,13 +29,30 @@ export class App {
 
     this.objs = [];
 
+    const tileMap = [
+      [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Block],
+      [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Block, TileType.Block],
+      [TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block],
+    ];
+
+
+
+    this.map = new Map(tileMap);
+
     this.deltaTime = 0;
     this.lastTimestamp = 0;
 
     this.events();
   }
   init() {
-    this.objs.push(new Charactor(new Vector(100, 1000)));
+    this.objs.push(new Charactor(new Vector(100, this.stageheight / 1.5)));
 
     window.requestAnimationFrame(this.render.bind(this));
   }
@@ -45,6 +63,20 @@ export class App {
     this.canvas.width = this.stagewidth * 2;
     this.canvas.height = this.stageheight * 2;
     this.ctx.scale(2, 2);
+
+
+
+    Constants.cTileSize = this.stagewidth / 19;//100
+    Constants.Gravity = -2;
+    Constants.MaxFallingSpeed = this.stagewidth/10;
+    Constants.minJumpSpeed = this.stageheight/200;
+    Constants.cWalkSpeed = this.stagewidth/200;
+    Constants.cJumpSpeed = Constants.minJumpSpeed*5;
+    Constants.cMinJumpSpeed = Constants.minJumpSpeed*3;
+    Constants.cSize = {
+      width: this.stagewidth/35,
+      height: this.stageheight/5.5,
+    };
   }
   render(t) {
     this.deltaTime = (t - this.lastTimestamp) / App.perfectFrameTime;
@@ -52,8 +84,10 @@ export class App {
 
     this.ctx.clearRect(0, 0, this.stagewidth, this.stageheight)
     this.objs.forEach(x => {
-      x.update(this.deltaTime, this.pressedKeys);
+      x.update(this.deltaTime, this.pressedKeys, this.map);
     });
+
+    this.map.render(this.ctx, this.stageheight);
     this.objs.forEach(x => {
       x.render(this.ctx, this.stageheight);
     });

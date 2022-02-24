@@ -9,9 +9,27 @@ export const TileType = {
 }
 
 const sprites = {
-  [TileType.Empty]: 'transparent',
-  [TileType.Block]: '#888',
-  [TileType.OneWay]: '#ddd'
+  [TileType.Empty]: (ctx, point) => {
+    ctx.beginPath();
+    ctx.fillStyle = 'transparent';
+    ctx.rect(point.x, point.y, Constants.cTileSize, Constants.cTileSize);
+    ctx.fill();
+    ctx.closePath();
+  },
+  [TileType.Block]: (ctx, point) => {
+    ctx.beginPath();
+    ctx.fillStyle = '#aaaa';
+    ctx.rect(point.x, point.y, Constants.cTileSize, Constants.cTileSize);
+    ctx.fill();
+    ctx.closePath();
+  },
+  [TileType.OneWay]: (ctx, point) => {
+    ctx.beginPath();
+    ctx.fillStyle = '#888a';
+    ctx.rect(point.x, point.y, Constants.cTileSize, Constants.cOneWayPlatformThreshold);
+    ctx.fill();
+    ctx.closePath();
+  },
 }
 
 export class Map {
@@ -63,7 +81,7 @@ export class Map {
   }
   getTile(x, y) {
     if (x < 0 || x > this.mWidth || y < 0 || y > this.mHeight) {
-      return TileType.Empty;
+      return TileType.Block;
     }
     return this.mTiles[y][x];
   }
@@ -94,17 +112,13 @@ export class Map {
           x: j,
         });
 
-        ctx.beginPath();
-        ctx.fillStyle = sprites[tile];
-        ctx.rect(point.x, point.y, Constants.cTileSize, Constants.cTileSize);
-        ctx.fill();
-        ctx.closePath();
+        sprites[tile](ctx, point);
 
-        ctx.beginPath();
-        ctx.fillStyle = '#000';
-        ctx.arc(point.x, point.y, 10, 0, Math.PI);
-        ctx.fill();
-        ctx.closePath();
+        // ctx.beginPath();
+        // ctx.fillStyle = sprites[tile];
+        // ctx.rect(point.x, point.y, Constants.cTileSize, Constants.cTileSize);
+        // ctx.fill();
+        // ctx.closePath();
 
         // ctx.beginPath();
         // ctx.fillStyle = '#000';
@@ -115,28 +129,5 @@ export class Map {
         // ctx.closePath();
       })
     });
-    let point = this.getMapTilePosition({
-      y: this.mTiles.length - 1,
-      x: 5,
-    });
-    ctx.beginPath();
-    ctx.fillStyle = '#000';
-    ctx.font = '50px serif';
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center'
-    ctx.fillText(`${point.y}`, point.x + Constants.cTileSize / 2, point.y + Constants.cTileSize / 2);
-    ctx.closePath();
-
-    point = this.getMapTilePosition({
-      y: 5,
-      x: 5,
-    });
-    ctx.beginPath();
-    ctx.fillStyle = '#000';
-    ctx.font = '50px serif';
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center'
-    ctx.fillText(`${point.y}`, point.x + Constants.cTileSize / 2, point.y + Constants.cTileSize / 2);
-    ctx.closePath();
   }
 }

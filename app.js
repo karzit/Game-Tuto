@@ -14,6 +14,7 @@ export const Constants = {
     height: 200,
   },
   cTileSize: 100,
+  cOneWayPlatformThreshold: 2,
 };
 
 export class App {
@@ -27,6 +28,8 @@ export class App {
     this.prevPressedKeys = {};
     this.pressedKeys = {};
 
+    this.clear = true;
+
     this.objs = [];
 
     const tileMap = [
@@ -35,7 +38,7 @@ export class App {
       [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
       [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
       [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
-      [TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.OneWay, TileType.OneWay, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Block, TileType.Empty, TileType.Empty, TileType.Empty],
       [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty],
       [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Block],
       [TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Empty, TileType.Block, TileType.Block],
@@ -67,22 +70,25 @@ export class App {
 
 
     Constants.cTileSize = this.stagewidth / 19;//100
-    Constants.Gravity = -2;
-    Constants.MaxFallingSpeed = this.stagewidth/10;
-    Constants.minJumpSpeed = this.stageheight/200;
-    Constants.cWalkSpeed = this.stagewidth/200;
-    Constants.cJumpSpeed = Constants.minJumpSpeed*5;
-    Constants.cMinJumpSpeed = Constants.minJumpSpeed*3;
+    Constants.Gravity = -(this.stageheight/500);
+    Constants.MaxFallingSpeed = this.stagewidth / 10;
+    Constants.minJumpSpeed = this.stageheight / 200;
+    Constants.cWalkSpeed = this.stagewidth / 200;
+    Constants.cJumpSpeed = Constants.minJumpSpeed * 5;
+    Constants.cMinJumpSpeed = Constants.minJumpSpeed * 3;
     Constants.cSize = {
-      width: this.stagewidth/35,
-      height: this.stageheight/5.5,
+      width: this.stagewidth / 35,
+      height: this.stageheight / 5.5,
     };
+    Constants.cOneWayPlatformThreshold = this.stageheight/40;
   }
   render(t) {
     this.deltaTime = (t - this.lastTimestamp) / App.perfectFrameTime;
     this.lastTimestamp = t;
 
-    this.ctx.clearRect(0, 0, this.stagewidth, this.stageheight)
+    if(this.clear) {
+      this.ctx.clearRect(0, 0, this.stagewidth, this.stageheight)
+    }
     this.objs.forEach(x => {
       x.update(this.deltaTime, this.pressedKeys, this.map);
     });

@@ -10,10 +10,10 @@ const CharacterState = {
 }
 
 const sprites = {
-  [CharacterState.Stand]: ['#3af'],
-  [CharacterState.Walk]: ['#f56'],
-  [CharacterState.Jump]: ['#3fa'],
-  [CharacterState.GrabLedge]: ['#af3'],
+  [CharacterState.Stand]: ['#3afa'],
+  [CharacterState.Walk]: ['#f56a'],
+  [CharacterState.Jump]: ['#3faa'],
+  [CharacterState.GrabLedge]: ['#af3a'],
 }
 
 export class Charactor extends MovingObject {
@@ -78,11 +78,17 @@ export class Charactor extends MovingObject {
       this.mCurrentState = CharacterState.Jump;
       return;
     }
+    if(pressedKeys['ArrowDown']) {
+      if(this.onOneWayPlatform) {
+        this.point.y -= Constants.cOneWayPlatformThreshold;
+      }
+      return;
+    }
   }
   walkUpdate(delta, pressedKeys) {
-    if (pressedKeys['ArrowRight'] == pressedKeys['ArrowLeft'] || (!pressedKeys['ArrowRight'] && !pressedKeys['ArrowLeft'])) {
+    if (!pressedKeys['ArrowRight'] == !pressedKeys['ArrowLeft']) {
       this.mCurrentState = CharacterState.Stand;
-      this.mSpeed = new Vector(0, 0);
+      this.mSpeed.x = 0;
       return;
     }
     if (pressedKeys['ArrowRight']) {
@@ -106,6 +112,13 @@ export class Charactor extends MovingObject {
       return;
     } else if (!this.mOnGround) {
       this.mCurrentState = CharacterState.Jump;
+      return;
+    }
+    
+    if(pressedKeys['ArrowDown']) {
+      if(this.onOneWayPlatform) {
+        this.point.y -= Constants.cOneWayPlatformThreshold;
+      }
       return;
     }
   }
